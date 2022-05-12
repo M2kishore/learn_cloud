@@ -1,10 +1,17 @@
 const express = require("express");
 const app = express();
-/** Decode Form URL Encoded data */
+const zipcodes = require("zipcodes");
+const mysql = require("mysql");
+
+//static variables
+let housename = "";
+let houseno = "";
+let zipcode = "";
+let housephoto = "";
+let city = "";
+let con = "";
+
 app.use(express.urlencoded());
-/** Show page with a form */ {
-  /* <h1>Contact Us</h1><form method="POST" action="/">Name:<input type="text" name="name" placeholder="name"><br>E-mail:<input type="email" name="email" placeholder="email"><br>WebAddress:<input type="text" name="webaddress" placeholder="web address"><br>Comments:<br><textarea id="comments" class="text" cols="41" rows ="10" name="comments"></textarea><br><input type="submit"></form> */
-}
 app.get("/", (req, res, next) => {
   let fileName = "/kishore_form.html";
   res.sendFile(fileName, { root: __dirname }, function (err) {
@@ -17,17 +24,20 @@ app.get("/", (req, res, next) => {
 });
 /** Process POST request */
 app.post("/", function (req, res, next) {
-  let houseno = JSON.stringify(req.body.houseno);
-  let housename = JSON.stringify(req.body.housename);
-  let zipcode = JSON.stringify(req.body.zipcode);
-  let housephoto = JSON.stringify(req.body.housephoto);
+  //connecting db
+  connectDb();
+  houseno = JSON.stringify(req.body.houseno);
+  housename = JSON.stringify(req.body.housename);
+  zipcode = JSON.stringify(req.body.zipcode);
+  housephoto = JSON.stringify(req.body.housephoto);
   if (
     houseno !== '""' &&
     housename !== '""' &&
     zipcode !== '""' &&
     housephoto !== '""'
   ) {
-    res.send(JSON.stringify(req.body));
+    insert(houseno, housename, zipcode, city, housephoto);
+    res.status(200).send("Congradulations table updated with ");
     //call db and give status
   } else {
     res.send(`<script>alert("fill all")</script>`);
@@ -38,3 +48,38 @@ app.post("/", function (req, res, next) {
   if (err) console.log(err);
   console.log("server listen on PORT 3000");
 });
+
+//helper functions
+function connectDb() {
+  con = mysql.createConnection({
+    host: "34.71.188.244",
+    user: "root",
+    port: "3306",
+    database: "eval",
+  });
+  con.connect(function (err) {
+    if (err) throw err;
+    console.log("Connected");
+    // if(err)throw err;
+    // console.log("Connected");
+    console.log(housename, houseno, housephoto, zipcode, city);
+    let zipObject = zipcodes.lookup(90210);
+    city = zipObject.city;
+    console.log(city);
+  });
+}
+
+function insert(hid, hname, zip, city, url) {
+  var sql =
+    "INSERT INTO house (houseid, housename,zipcode,city,housephoto) VALUES ?";
+  var ct = "select * from house";
+  var values = [[hid, hname, zip, city, url]];
+  con.query(sql, [values], function (err, result) {
+    if (err) throw err;
+    console.log("Number of records inserted: " + result.affectedRows);
+  });
+  con.query(ct, function (err, result) {
+    if (err) throw err;
+    console.log(result);
+  });
+}
