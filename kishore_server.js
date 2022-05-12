@@ -17,16 +17,15 @@ app.get("/", (req, res, next) => {
 });
 /** Process POST request */
 app.post("/", function (req, res, next) {
-  let name = JSON.stringify(req.body.name);
-  let email = JSON.stringify(req.body.email);
-  let webAddress = JSON.stringify(req.body.webaddress);
-  let comments = JSON.stringify(req.body.comments);
-  console.log(name === "");
+  let houseno = JSON.stringify(req.body.houseno);
+  let housename = JSON.stringify(req.body.housename);
+  let zipcode = JSON.stringify(req.body.zipcode);
+  let housephoto = JSON.stringify(req.body.housephoto);
   if (
-    name !== '""' &&
-    email !== '""' &&
-    webAddress !== '""' &&
-    comments !== '""'
+    houseno !== '""' &&
+    housename !== '""' &&
+    zipcode !== '""' &&
+    housephoto !== '""'
   ) {
     res.send(JSON.stringify(req.body));
     //call db and give status
