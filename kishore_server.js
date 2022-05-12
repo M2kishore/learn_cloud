@@ -30,6 +30,10 @@ app.post("/", function (req, res, next) {
   housename = JSON.stringify(req.body.housename);
   zipcode = JSON.stringify(req.body.zipcode);
   housephoto = JSON.stringify(req.body.housephoto);
+  console.log(housename, houseno, housephoto, zipcode, city);
+  let zipObject = zipcodes.lookup(90210);
+  city = zipObject.city;
+  console.log(city);
   if (
     houseno !== '""' &&
     housename !== '""' &&
@@ -37,7 +41,7 @@ app.post("/", function (req, res, next) {
     housephoto !== '""'
   ) {
     insert(houseno, housename, zipcode, city, housephoto);
-    res.status(200).send("Congradulations table updated with ");
+    res.status(200).send("Congratulations table updated with ");
     //call db and give status
   } else {
     res.send(`<script>alert("fill all")</script>`);
@@ -62,10 +66,6 @@ function connectDb() {
     console.log("Connected");
     // if(err)throw err;
     // console.log("Connected");
-    console.log(housename, houseno, housephoto, zipcode, city);
-    let zipObject = zipcodes.lookup(90210);
-    city = zipObject.city;
-    console.log(city);
   });
 }
 
